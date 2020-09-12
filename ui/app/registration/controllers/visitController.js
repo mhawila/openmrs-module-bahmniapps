@@ -12,6 +12,8 @@ angular.module('bahmni.registration')
             var selectedProvider = $rootScope.currentProvider;
             var regEncounterTypeUuid = $rootScope.regEncounterConfiguration.encounterTypes[Bahmni.Registration.Constants.registrationEncounterType];
             var visitLocationUuid = $rootScope.visitLocation;
+            $scope.visitAttributeTypes = appService.getAppDescriptor().getExtensions("tz.co.juutech.registration.visitAttributeType", "config");
+            // console.log($scope.visitAttributeTypes)
 
             var getPatient = function () {
                 var deferred = $q.defer();

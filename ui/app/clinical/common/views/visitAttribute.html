@@ -1,0 +1,21 @@
+<form novalidate>
+<div class="clearfix">
+    <label>{{::name}}</label>
+    <article ng-if="attributeType.dataTypeOptions">
+        <select ng-options="option.name for option in options" ng-model="attributeType.value"></select>
+    </article>
+    <article ng-if="!attributeType.dataTypeOptions">
+        <input type="text" ng-model="attributeType.value"/>
+    </article>
+    <div>
+        <label for="member-id">Member ID</label>
+        <input type="text" id="member-id" ng-model="memberId"/>
+        <div ng-if="verifyEnabled() && attributeType.value.name === 'NHIF'">
+            <label>Visit Type</label>
+            <select ng-options="visitType.type for visitType in attributeType.value.visitTypes track by visitType.id"
+                ng-model="attributeType.chosenVisitType"></select>
+        </div>
+        <button  ng-if="verifyEnabled()" ng-click="verify()">Verify</button>
+    </div>
+</div>
+</form>

@@ -25,6 +25,17 @@
                             </div>
                         </div>
                     </section>
+                    <section class="observation-section">
+                        <div ng-repeat="visitAttributeType in ::visitAttributeTypes" class="concept-set-group">
+                            <div class="registraion_legend">
+                                <span class="mylegend">{{ visitAttributeType.extensionParams.visitAttributeTypeName }}</span>
+                            </div>
+                            <visit-attribute
+                                name="visitAttributeType.extensionParams.visitAttributeTypeName"
+                                options="visitAttributeType.extensionParams.options">
+                            </visit-attribute>
+                        </div>
+                    </section>
                     <!-- TODO: need to find a better way to render the directive again on context change or after all the calls are made.-->
                     <section class="observation-section" ng-if="context">
                         <div ng-repeat="conceptSet in ::availableConceptSets" class="concept-set-group">

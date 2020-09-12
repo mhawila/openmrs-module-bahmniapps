@@ -94,6 +94,7 @@ Bahmni.Common = Bahmni.Common || {};
         endVisitUrl: BAHMNI_CORE + "/visit/endVisit",
         endVisitAndCreateEncounterUrl: BAHMNI_CORE + "/visit/endVisitAndCreateEncounter",
         visitTypeUrl: RESTWS_V1 + "/visittype",
+        visitAttributeTypeUrl: RESTWS_V1 + "/visitattributetype",
         patientImageUrlByPatientUuid: RESTWS_V1 + "/patientImage?patientUuid=",
         labResultUploadedFileNameUrl: "/uploaded_results/",
         visitSummaryUrl: BAHMNI_CORE + "/visit/summary",
@@ -261,4 +262,3 @@ Bahmni.Common = Bahmni.Common || {};
         formBuilderTranslationApi: IE_APPS_API + '/form/translate'
     };
 })();
-
