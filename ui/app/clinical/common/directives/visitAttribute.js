@@ -4,6 +4,7 @@ angular.module('bahmni.clinical')
         var OPTIONS_DATATYPE = 'org.openmrs.customdatatype.datatype.SpecifiedTextOptionsDatatype';
         var NHIF_AUTH_URL_SUFFIX = '/breeze/verification/AuthorizeCard';
         var TOKEN_URL_SUFFIX = '/Token'
+        var VERIFICATION_URL_SUFFIX =  '/module/nhifinsurance/verification.json';
 
         var _verifyMemberNHIFCard = function(scope, accessTokenInfo) {
             $http({
@@ -19,6 +20,9 @@ angular.module('bahmni.clinical')
                 }
             }).then(function(response) {
                 console.log('NHIF response', response);
+                if(response.data) {
+                    scope.nhifVerificationResult = response.data
+                }
             }).catch(function(err) {
                 console.log(err);
             });
@@ -36,49 +40,35 @@ angular.module('bahmni.clinical')
             });
 
             var tokenExpired = function(tokenInfo) {
-                return Date.now() >= Date.parse(tokenInfo['.expires'])
+                return Date.now() <= Date.parse(tokenInfo['.expires'])
             }
 
-            $scope.verify = function() {
-                console.log('Hebu tuone $scope.attributeType', $scope.attributeType);
-                var openhimAuth = $base64.encode('nhif:nhif123');
-                // Check for access token in the session storage.
-                var accessTokenInfo = sessionStorage.getItem('accessTokenInfo');
-                if(!accessTokenInfo || tokenExpired(JSON.parse(accessTokenInfo))) {
+            $scope.verifyMember = function() {
+                console.log('HOST URL:', localStorage.getItem('host'))
                     $http({
-                        method: 'POST',
-                        url: $scope.attributeType.value.baseServiceUrl + TOKEN_URL_SUFFIX,
-                        headers: {
-                            // 'Authorization': 'Basic: ' + openhimAuth,
-                            'Content-Type': 'application/x-www-form-urlencoded'
+                        method: 'GET',
+                        url: $scope.attributeType.value.baseServiceUrl + VERIFICATION_URL_SUFFIX,
+                        params: {
+                            "card-no": $scope.memberId + '',
+                            "visit-type-id": $scope.attributeType.chosenVisitType.id + '',
+                            "referral-no": $scope.attributeType.value.referralNo + ''
                         },
-                        data: {
-                            username: $scope.attributeType.value.username,
-                            password: $scope.attributeType.value.password,
-                            grant_type: $scope.attributeType.value.grant_type
+                        transformRequest: function(params) {
+                            var transformed = [];
+                            for (var key in params) {
+                                transformed.push(encodeURIComponent(key) + '=' + encodeURIComponent(params[key]));
+                            }
+                            return transformed.join('&');
                         },
-                        transformRequest: function(obj) {
-                            var str = [];
-                            for(var p in obj)
-                            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-                            return str.join("&");
-                        },
+                        withCredentials: true
                     }).then(function(response) {
-                        if(response.status !== 200) {
-                            console.log('Token could not be issued with');
-                            console.log(response.data);
-                            throw new Error('Token could not be issued')
-                        } else {
-                            sessionStorage.setItem('accessTokenInfo', JSON.stringify(response.data));
-                            return response.data;
+                        console.log('NHIF response', response);
+                        if(response.data) {
+                            $scope.nhifVerificationResult = response.data
                         }
-                    }).then(function(accessTokenInfo) {
-                        _verifyMemberNHIFCard($scope, accessTokenInfo)
-                    });
-                } else {
-                    // token found and not expired.
-                    _verifyMemberNHIFCard($scope, JSON.parse(accessTokenInfo))
-                }
+                }).catch(function(err) {
+                    console.log(err);
+                });
             }
 
             $scope.verifyEnabled = function() {
@@ -92,23 +82,6 @@ angular.module('bahmni.clinical')
                 }
                 return false;
             }
-
-            // $scope.$watch('attributeType.value', function() {
-            //     console.log('$scope.attributeType', $scope.attributeType)
-            //     if($scope.attributeType && $scope.attributeType.value) {
-            //         var chosenOption = $scope.options.find(function(option) {
-            //             return option.name === $scope.attributeType.value;
-            //         });
-            //
-            //         if(chosenOption) {
-            //             $scope.attributeType.visitTypes = undefined;
-            //             // get the visit types if any.
-            //             if(chosenOption.visitTypes) {
-            //                 $scope.attributeType.visitTypes = chosenOption.visitTypes;
-            //             }
-            //         };
-            //     }
-            // });
         };
 
         return {
